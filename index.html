@@ -1,1 +1,277 @@
-<!doctypehtml><html lang=en-us><head><meta charset=utf-8><meta content="text/html; charset=utf-8"http-equiv=Content-Type><title>Cuyo Web Port</title><link href=data:image/x-icon;base64,AAABAAEAAQEAAAEAIAAwAAAAFgAAACgAAAABAAAAAgAAAAEAIAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAnJycA rel=icon><style>body{font-family:Outfit,sans-serif;margin:0;padding:0;background-color:#0d0d1a;color:#e0e0e0;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;overflow:hidden;background:radial-gradient(circle at center,#1a1a3a 0,#0d0d1a 100%)}:root{--btn-size:min(120px, calc((100vw - 15px - 85px) / 4))}#main-layout{display:flex;flex-direction:row;align-items:center;justify-content:space-around;width:98vw;height:98vh;position:relative;overflow:hidden;gap:20px}#container{height:95vh;position:relative;box-shadow:0 0 50px rgba(0,0,0,.8),0 0 20px rgba(100,100,255,.2);border:2px solid #2a2a4a;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:transform .2s ease-out}#main-layout.force-side{flex-direction:row!important}#main-layout.force-side .side-controls{display:flex!important}#main-layout.force-side .bottom-controls{display:none!important}#main-layout.force-bottom{flex-direction:column!important}#main-layout.force-bottom .side-controls{display:none!important}#main-layout.force-bottom .bottom-controls{display:flex!important}#main-layout.force-hidden .bottom-controls,#main-layout.force-hidden .side-controls{display:none!important}canvas{display:block;background-color:#000;image-rendering:auto;max-width:100%;max-height:100%}.side-controls{height:95vh;justify-content:center;display:flex;flex-direction:column;gap:15vh;padding:0 10px;z-index:10}.bottom-controls{display:none;width:95vw;justify-content:space-between;flex-direction:row;padding:0 10px;z-index:10}@media (orientation:portrait){#main-layout{display:flex;flex-direction:column;align-items:center;justify-content:space-around;width:100%;height:100%;position:relative}.side-controls{display:none}.bottom-controls{display:flex}canvas{height:100%!important;width:auto!important;max-width:none!important;transform:none!important;object-fit:contain!important;touch-action:none!important}}#output{display:none}#hamburger-menu{position:absolute;top:15px;right:15px;z-index:1000}#hamburger-btn{background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:calc(var(--btn-size) * .4);padding:calc(var(--btn-size) * .1) calc(var(--btn-size) * .2);border-radius:5px;cursor:pointer}#hamburger-content{display:none;position:absolute;top:calc(var(--btn-size) * .7);right:0;background:rgba(20,20,40,.9);border:1px solid rgba(255,255,255,.2);border-radius:5px;padding:10px;flex-direction:column;gap:10px}#hamburger-content.show{display:flex}#pause-btn{position:absolute;top:15px;left:50%;transform:translateX(-50%);z-index:1000;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:calc(var(--btn-size) * .3);padding:calc(var(--btn-size) * .1) calc(var(--btn-size) * .3);border-radius:5px;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none}.utility-button{background:rgba(255,255,255,.05);color:#aaa;border:1px solid rgba(255,255,255,.1);padding:calc(var(--btn-size) * .2) calc(var(--btn-size) * .3);border-radius:4px;font-size:calc(var(--btn-size) * .25);cursor:pointer;transition:all .2s;white-space:nowrap}.utility-button:hover{background:rgba(255,255,255,.1);color:#fff}#fileInput{display:none}.touch-btn{width:var(--btn-size);height:var(--btn-size);flex-shrink:0;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.3);border-radius:50%;color:#fff;font-size:calc(var(--btn-size) * .4);display:flex;align-items:center;justify-content:center;user-select:none;-webkit-user-select:none;touch-action:none}.touch-btn:active{background:rgba(255,255,255,.3);transform:scale(.95)}</style></head><body><div id=pause-btn class=touch-btn-key data-key=Escape>PAUSE</div><div id=hamburger-menu><button onclick=toggleMenu(event) id=hamburger-btn>≡</button><div id=hamburger-content><button onclick=exportSave(),toggleMenu() class=utility-button>EXPORT SAVE</button> <button onclick='document.getElementById("fileInput").click(),toggleMenu()'class=utility-button>IMPORT SAVE</button><div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid rgba(255,255,255,.1);padding-top:10px;margin-top:5px"><span style=font-size:10px;color:#888;text-align:center>UI LAYOUT</span> <button onclick='setUILayout("auto"),toggleMenu()'class=utility-button>AUTO</button> <button onclick='setUILayout("side"),toggleMenu()'class=utility-button>SIDE</button> <button onclick='setUILayout("bottom"),toggleMenu()'class=utility-button>BOTTOM</button> <button onclick='setUILayout("hidden"),toggleMenu()'class=utility-button>HIDDEN</button></div><input id=fileInput onchange=importSave(event) type=file></div></div><div id=main-layout><div id=controls-left class=side-controls><div id=btn-left class=touch-btn data-key=ArrowLeft>←</div><div id=btn-down class=touch-btn data-key=ArrowDown>↓</div></div><div id=container><canvas id=canvas oncontextmenu=event.preventDefault() tabindex=-1></canvas></div><div id=controls-right class=side-controls><div id=btn-rotate class=touch-btn data-key=ArrowUp>↻</div><div id=btn-right class=touch-btn data-key=ArrowRight>→</div></div><div id=controls-bottom class=bottom-controls><div id=btn-left-b class=touch-btn data-key=ArrowLeft>←</div><div id=btn-down-b class=touch-btn data-key=ArrowDown>↓</div><div id=btn-rotate-b class=touch-btn data-key=ArrowUp>↻</div><div id=btn-right-b class=touch-btn data-key=ArrowRight>→</div></div></div><textarea id=output rows=8></textarea><script>window.location.pathname.endsWith("cuyo_shell.html")&&alert("Note: This is the template shell. Please open 'index.html' to play the game with all changes applied."),function(){const e=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(t,o){return"2d"===t&&((o=o||{}).willReadFrequently=!0),e.call(this,t,o)}}();var statusElement=document.getElementById("status"),Module={preRun:[function(){FS.mkdir("/home/cuyo"),FS.mount(IDBFS,{},"/home/cuyo"),ENV.HOME="/home/cuyo",addRunDependency("syncfs-load"),FS.syncfs(!0,(function(e){e?console.error("IDBFS initial sync error:",e):(console.log("IDBFS synced from IndexedDB successfully"),loadUILayout()),removeRunDependency("syncfs-load")}))}],postRun:[function(){}],print:function(e){arguments.length>1&&(e=Array.prototype.slice.call(arguments).join(" ")),console.log(e)},printErr:function(e){arguments.length>1&&(e=Array.prototype.slice.call(arguments).join(" ")),console.error(e)},SDL_canPlayWithWebAudio:function(e){return!e||!e.toLowerCase().endsWith(".it")},noAudioDecoding:!0,canvas:document.getElementById("canvas"),setStatus:function(e){if(Module.setStatus.last||(Module.setStatus.last={time:Date.now(),text:""}),e!==Module.setStatus.last.text){var t=e.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/),o=Date.now();t&&o-Module.setStatus.last.time<30||(Module.setStatus.last.time=o,Module.setStatus.last.text=e,console.log("Status: "+e))}},totalDependencies:0,monitorRunDependencies:function(e){this.totalDependencies=Math.max(this.totalDependencies,e)}};function js_sync_fs(){"undefined"!=typeof FS&&FS.syncfs&&(console.log("Syncing FS to IndexedDB..."),FS.syncfs(!1,(function(e){e?console.error("Error syncing FS:",e):console.log("FS synced successfully")})))}function exportSave(){try{const e=FS.readFile("/home/cuyo/.cuyo",{encoding:"utf8"}),t=new Blob([e],{type:"text/plain"}),o=URL.createObjectURL(t),n=document.createElement("a");n.href=o,n.download="cuyo.save",n.click(),URL.revokeObjectURL(o)}catch(e){alert("No save data found to export.")}}function importSave(e){const t=e.target.files[0];if(!t)return;const o=new FileReader;o.onload=function(e){const t=e.target.result;if(void 0!==Module&&"function"==typeof Module._importSaveData){const e=allocate(intArrayFromString(t),"i8",ALLOC_NORMAL);Module._importSaveData(e),_free(e),alert("Save imported successfully! The page will now reload."),location.reload()}},o.readAsText(t)}Module.setStatus("Downloading..."),window.onerror=function(){Module.setStatus("Exception thrown, see JavaScript console")},window.addEventListener("keydown",(function(e){["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].indexOf(e.code)>-1&&e.preventDefault(),"+"===e.key||"="===e.key?adjustZoom(.1):"-"===e.key&&adjustZoom(-.1)}),!1);var currentZoom=1;function adjustZoom(e){currentZoom=Math.max(.5,Math.min(3,currentZoom+e)),document.getElementById("container").style.transform=`scale(${currentZoom})`}function toggleMenu(e){e&&e.stopPropagation();document.getElementById("hamburger-content").classList.toggle("show")}document.addEventListener("click",(function(e){const t=document.getElementById("hamburger-menu"),o=document.getElementById("hamburger-content");if(!t.contains(e.target)&&o.classList.contains("show"))return o.classList.remove("show"),e.stopPropagation(),void e.preventDefault();document.getElementById("canvas").focus(),"undefined"!=typeof SDL&&SDL.audioContext&&"suspended"===SDL.audioContext.state?SDL.audioContext.resume().then((()=>{console.log("AudioContext resumed successfully"),void 0!==Module&&"function"==typeof Module._syncMusic&&Module._syncMusic()})):void 0!==Module&&"function"==typeof Module._syncMusic&&Module._syncMusic()}),!0);const keyCodeMap={ArrowLeft:37,ArrowRight:39,ArrowUp:38,ArrowDown:40,Space:32,Escape:27};function simulateKeyEvent(e,t){const o=keyCodeMap[t],n=new KeyboardEvent(e,{bubbles:!0,cancelable:!0,key:"Space"===t?" ":"Escape"===t?"Escape":t,code:t,keyCode:o,which:o,view:window});document.dispatchEvent(n)}const touchBtns=document.querySelectorAll(".touch-btn, .touch-btn-key");touchBtns.forEach((e=>{const t=e.getAttribute("data-key");let o=!1;const n=e=>{e.preventDefault(),e.stopPropagation(),o&&(o=!1,simulateKeyEvent("keyup",t))};e.addEventListener("pointerdown",(e=>{e.preventDefault(),e.stopPropagation(),o||(o=!0,simulateKeyEvent("keydown",t))})),e.addEventListener("pointerup",n),e.addEventListener("pointercancel",n),e.addEventListener("pointerout",n)}));const canvasEl=document.getElementById("canvas");let spacePressed=!1;canvasEl.addEventListener("pointerdown",(function(e){spacePressed||(spacePressed=!0,simulateKeyEvent("keydown","Space"))})),canvasEl.addEventListener("pointerup",(function(e){spacePressed&&(spacePressed=!1,simulateKeyEvent("keyup","Space"))})),canvasEl.addEventListener("pointerout",(function(e){spacePressed&&(spacePressed=!1,simulateKeyEvent("keyup","Space"))})),canvasEl.addEventListener("pointercancel",(function(e){spacePressed&&(spacePressed=!1,simulateKeyEvent("keyup","Space"))}));const UI_CONFIG_PATH="/home/cuyo/.ui_config";let currentUIMode="auto";function setUILayout(e){currentUIMode=e,applyUILayout(e),saveUILayout(e)}function applyUILayout(e){const t=document.getElementById("main-layout");t.classList.remove("force-side","force-bottom","force-hidden"),"side"===e&&t.classList.add("force-side"),"bottom"===e&&t.classList.add("force-bottom"),"hidden"===e&&t.classList.add("force-hidden"),console.log("UI Mode applied:",e)}function saveUILayout(e){if("undefined"!=typeof FS)try{FS.writeFile(UI_CONFIG_PATH,e),js_sync_fs()}catch(e){console.error("Error saving UI config:",e)}}function loadUILayout(){if("undefined"!=typeof FS)try{FS.analyzePath(UI_CONFIG_PATH).exists&&(currentUIMode=FS.readFile(UI_CONFIG_PATH,{encoding:"utf8"}).trim(),applyUILayout(currentUIMode))}catch(e){console.log("No UI config found yet.")}}</script><script async src=index.js></script></body></html>
+<!doctypehtml>
+    <html lang=en-us>
+
+    <head>
+        <meta charset=utf-8>
+        <meta content="text/html; charset=utf-8" http-equiv=Content-Type>
+        <title>Cuyo Web Port</title>
+        <link
+            href=data:image/x-icon;base64,AAABAAEAAQEAAAEAIAAwAAAAFgAAACgAAAABAAAAAgAAAAEAIAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAnJycA
+            rel=icon>
+        <style>
+            body {
+                font-family: Outfit, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #0d0d1a;
+                color: #e0e0e0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                overflow: hidden;
+                background: radial-gradient(circle at center, #1a1a3a 0, #0d0d1a 100%)
+            }
+
+            :root {
+                --btn-size: min(120px, calc((100vw - 15px - 85px) / 4))
+            }
+
+            #main-layout {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-around;
+                width: 98vw;
+                height: 98vh;
+                position: relative;
+                overflow: hidden;
+                gap: 20px
+            }
+
+            #container {
+                height: 95vh;
+                position: relative;
+                box-shadow: 0 0 50px rgba(0, 0, 0, .8), 0 0 20px rgba(100, 100, 255, .2);
+                border: 2px solid #2a2a4a;
+                border-radius: 8px;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: transform .2s ease-out
+            }
+
+            #main-layout.force-side {
+                flex-direction: row !important
+            }
+
+            #main-layout.force-side .side-controls {
+                display: flex !important
+            }
+
+            #main-layout.force-side .bottom-controls {
+                display: none !important
+            }
+
+            #main-layout.force-bottom {
+                flex-direction: column !important
+            }
+
+            #main-layout.force-bottom .side-controls {
+                display: none !important
+            }
+
+            #main-layout.force-bottom .bottom-controls {
+                display: flex !important
+            }
+
+            #main-layout.force-hidden .bottom-controls,
+            #main-layout.force-hidden .side-controls {
+                display: none !important
+            }
+
+            canvas {
+                display: block;
+                background-color: #000;
+                image-rendering: auto;
+                max-width: 100%;
+                max-height: 100%
+            }
+
+            .side-controls {
+                height: 95vh;
+                justify-content: center;
+                display: flex;
+                flex-direction: column;
+                gap: 15vh;
+                padding: 0 10px;
+                z-index: 10
+            }
+
+            .bottom-controls {
+                display: none;
+                width: 95vw;
+                justify-content: space-between;
+                flex-direction: row;
+                padding: 0 10px;
+                z-index: 10
+            }
+
+            @media (orientation:portrait) {
+                #main-layout {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: space-around;
+                    position: relative
+                }
+
+                .side-controls {
+                    display: none
+                }
+
+                .bottom-controls {
+                    display: flex
+                }
+
+                canvas {
+                    height: 100% !important;
+                    width: auto !important;
+                    max-width: none !important;
+                    transform: none !important;
+                    object-fit: contain !important;
+                    touch-action: none !important
+                }
+            }
+
+            #output {
+                display: none
+            }
+
+            #hamburger-menu {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                z-index: 1000
+            }
+
+            #hamburger-btn {
+                background: rgba(0, 0, 0, .5);
+                border: 1px solid rgba(255, 255, 255, .2);
+                color: #fff;
+                font-size: calc(var(--btn-size) * .4);
+                padding: calc(var(--btn-size) * .1) calc(var(--btn-size) * .2);
+                border-radius: 5px;
+                cursor: pointer
+            }
+
+            #hamburger-content {
+                display: none;
+                position: absolute;
+                top: calc(var(--btn-size) * .7);
+                right: 0;
+                background: rgba(20, 20, 40, .9);
+                border: 1px solid rgba(255, 255, 255, .2);
+                border-radius: 5px;
+                padding: 10px;
+                flex-direction: column;
+                gap: 10px
+            }
+
+            #hamburger-content.show {
+                display: flex
+            }
+
+            #pause-btn {
+                position: absolute;
+                top: 15px;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 1000;
+                background: rgba(0, 0, 0, .5);
+                border: 1px solid rgba(255, 255, 255, .2);
+                color: #fff;
+                font-size: calc(var(--btn-size) * .3);
+                padding: calc(var(--btn-size) * .1) calc(var(--btn-size) * .3);
+                border-radius: 5px;
+                cursor: pointer;
+                user-select: none;
+                -webkit-user-select: none;
+                touch-action: none
+            }
+
+            .utility-button {
+                background: rgba(255, 255, 255, .05);
+                color: #aaa;
+                border: 1px solid rgba(255, 255, 255, .1);
+                padding: calc(var(--btn-size) * .2) calc(var(--btn-size) * .3);
+                border-radius: 4px;
+                font-size: calc(var(--btn-size) * .25);
+                cursor: pointer;
+                transition: all .2s;
+                white-space: nowrap
+            }
+
+            .utility-button:hover {
+                background: rgba(255, 255, 255, .1);
+                color: #fff
+            }
+
+            #fileInput {
+                display: none
+            }
+
+            .touch-btn {
+                width: var(--btn-size);
+                height: var(--btn-size);
+                flex-shrink: 0;
+                background: rgba(255, 255, 255, .1);
+                border: 2px solid rgba(255, 255, 255, .3);
+                border-radius: 50%;
+                color: #fff;
+                font-size: calc(var(--btn-size) * .4);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                user-select: none;
+                -webkit-user-select: none;
+                touch-action: none
+            }
+
+            .touch-btn:active {
+                background: rgba(255, 255, 255, .3);
+                transform: scale(.95)
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id=pause-btn class=touch-btn-key data-key=Escape>PAUSE</div>
+        <div id=hamburger-menu><button onclick=toggleMenu(event) id=hamburger-btn>≡</button>
+            <div id=hamburger-content><button onclick=exportSave(),toggleMenu() class=utility-button>EXPORT
+                    SAVE</button> <button onclick='document.getElementById("fileInput").click(),toggleMenu()'
+                    class=utility-button>IMPORT SAVE</button>
+                <div
+                    style="display:flex;flex-direction:column;gap:5px;border-top:1px solid rgba(255,255,255,.1);padding-top:10px;margin-top:5px">
+                    <span style=font-size:10px;color:#888;text-align:center>UI LAYOUT</span> <button
+                        onclick='setUILayout("auto"),toggleMenu()' class=utility-button>AUTO</button> <button
+                        onclick='setUILayout("side"),toggleMenu()' class=utility-button>SIDE</button> <button
+                        onclick='setUILayout("bottom"),toggleMenu()' class=utility-button>BOTTOM</button> <button
+                        onclick='setUILayout("hidden"),toggleMenu()' class=utility-button>HIDDEN</button>
+                </div><input id=fileInput onchange=importSave(event) type=file>
+            </div>
+        </div>
+        <div id=main-layout>
+            <div id=controls-left class=side-controls>
+                <div id=btn-left class=touch-btn data-key=ArrowLeft>←</div>
+                <div id=btn-down class=touch-btn data-key=ArrowDown>↓</div>
+            </div>
+            <div id=container><canvas id=canvas oncontextmenu=event.preventDefault() tabindex=-1></canvas></div>
+            <div id=controls-right class=side-controls>
+                <div id=btn-rotate class=touch-btn data-key=ArrowUp>↻</div>
+                <div id=btn-right class=touch-btn data-key=ArrowRight>→</div>
+            </div>
+            <div id=controls-bottom class=bottom-controls>
+                <div id=btn-left-b class=touch-btn data-key=ArrowLeft>←</div>
+                <div id=btn-down-b class=touch-btn data-key=ArrowDown>↓</div>
+                <div id=btn-rotate-b class=touch-btn data-key=ArrowUp>↻</div>
+                <div id=btn-right-b class=touch-btn data-key=ArrowRight>→</div>
+            </div>
+        </div><textarea id=output rows=8></textarea>
+        <script>window.location.pathname.endsWith("cuyo_shell.html") && alert("Note: This is the template shell. Please open 'index.html' to play the game with all changes applied."), function () { const e = HTMLCanvasElement.prototype.getContext; HTMLCanvasElement.prototype.getContext = function (t, o) { return "2d" === t && ((o = o || {}).willReadFrequently = !0), e.call(this, t, o) } }(); var statusElement = document.getElementById("status"), Module = { preRun: [function () { FS.mkdir("/home/cuyo"), FS.mount(IDBFS, {}, "/home/cuyo"), ENV.HOME = "/home/cuyo", addRunDependency("syncfs-load"), FS.syncfs(!0, (function (e) { e ? console.error("IDBFS initial sync error:", e) : (console.log("IDBFS synced from IndexedDB successfully"), loadUILayout()), removeRunDependency("syncfs-load") })) }], postRun: [function () { }], print: function (e) { arguments.length > 1 && (e = Array.prototype.slice.call(arguments).join(" ")), console.log(e) }, printErr: function (e) { arguments.length > 1 && (e = Array.prototype.slice.call(arguments).join(" ")), console.error(e) }, SDL_canPlayWithWebAudio: function (e) { return !e || !e.toLowerCase().endsWith(".it") }, noAudioDecoding: !0, canvas: document.getElementById("canvas"), setStatus: function (e) { if (Module.setStatus.last || (Module.setStatus.last = { time: Date.now(), text: "" }), e !== Module.setStatus.last.text) { var t = e.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/), o = Date.now(); t && o - Module.setStatus.last.time < 30 || (Module.setStatus.last.time = o, Module.setStatus.last.text = e, console.log("Status: " + e)) } }, totalDependencies: 0, monitorRunDependencies: function (e) { this.totalDependencies = Math.max(this.totalDependencies, e) } }; function js_sync_fs() { "undefined" != typeof FS && FS.syncfs && (console.log("Syncing FS to IndexedDB..."), FS.syncfs(!1, (function (e) { e ? console.error("Error syncing FS:", e) : console.log("FS synced successfully") }))) } function exportSave() { try { const e = FS.readFile("/home/cuyo/.cuyo", { encoding: "utf8" }), t = new Blob([e], { type: "text/plain" }), o = URL.createObjectURL(t), n = document.createElement("a"); n.href = o, n.download = "cuyo.save", n.click(), URL.revokeObjectURL(o) } catch (e) { alert("No save data found to export.") } } function importSave(e) { const t = e.target.files[0]; if (!t) return; const o = new FileReader; o.onload = function (e) { const t = e.target.result; if (void 0 !== Module && "function" == typeof Module._importSaveData) { const e = allocate(intArrayFromString(t), "i8", ALLOC_NORMAL); Module._importSaveData(e), _free(e), alert("Save imported successfully! The page will now reload."), location.reload() } }, o.readAsText(t) } Module.setStatus("Downloading..."), window.onerror = function () { Module.setStatus("Exception thrown, see JavaScript console") }, window.addEventListener("keydown", (function (e) { ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].indexOf(e.code) > -1 && e.preventDefault(), "+" === e.key || "=" === e.key ? adjustZoom(.1) : "-" === e.key && adjustZoom(-.1) }), !1); var currentZoom = 1; function adjustZoom(e) { currentZoom = Math.max(.5, Math.min(3, currentZoom + e)), document.getElementById("container").style.transform = `scale(${currentZoom})` } function toggleMenu(e) { e && e.stopPropagation(); document.getElementById("hamburger-content").classList.toggle("show") } document.addEventListener("click", (function (e) { const t = document.getElementById("hamburger-menu"), o = document.getElementById("hamburger-content"); if (!t.contains(e.target) && o.classList.contains("show")) return o.classList.remove("show"), e.stopPropagation(), void e.preventDefault(); document.getElementById("canvas").focus(), "undefined" != typeof SDL && SDL.audioContext && "suspended" === SDL.audioContext.state ? SDL.audioContext.resume().then((() => { console.log("AudioContext resumed successfully"), void 0 !== Module && "function" == typeof Module._syncMusic && Module._syncMusic() })) : void 0 !== Module && "function" == typeof Module._syncMusic && Module._syncMusic() }), !0); const keyCodeMap = { ArrowLeft: 37, ArrowRight: 39, ArrowUp: 38, ArrowDown: 40, Space: 32, Escape: 27 }; function simulateKeyEvent(e, t) { const o = keyCodeMap[t], n = new KeyboardEvent(e, { bubbles: !0, cancelable: !0, key: "Space" === t ? " " : "Escape" === t ? "Escape" : t, code: t, keyCode: o, which: o, view: window }); document.dispatchEvent(n) } const touchBtns = document.querySelectorAll(".touch-btn, .touch-btn-key"); touchBtns.forEach((e => { const t = e.getAttribute("data-key"); let o = !1; const n = e => { e.preventDefault(), e.stopPropagation(), o && (o = !1, simulateKeyEvent("keyup", t)) }; e.addEventListener("pointerdown", (e => { e.preventDefault(), e.stopPropagation(), o || (o = !0, simulateKeyEvent("keydown", t)) })), e.addEventListener("pointerup", n), e.addEventListener("pointercancel", n), e.addEventListener("pointerout", n) })); const canvasEl = document.getElementById("canvas"); let spacePressed = !1; canvasEl.addEventListener("pointerdown", (function (e) { spacePressed || (spacePressed = !0, simulateKeyEvent("keydown", "Space")) })), canvasEl.addEventListener("pointerup", (function (e) { spacePressed && (spacePressed = !1, simulateKeyEvent("keyup", "Space")) })), canvasEl.addEventListener("pointerout", (function (e) { spacePressed && (spacePressed = !1, simulateKeyEvent("keyup", "Space")) })), canvasEl.addEventListener("pointercancel", (function (e) { spacePressed && (spacePressed = !1, simulateKeyEvent("keyup", "Space")) })); const UI_CONFIG_PATH = "/home/cuyo/.ui_config"; let currentUIMode = "auto"; function setUILayout(e) { currentUIMode = e, applyUILayout(e), saveUILayout(e) } function applyUILayout(e) { const t = document.getElementById("main-layout"); t.classList.remove("force-side", "force-bottom", "force-hidden"), "side" === e && t.classList.add("force-side"), "bottom" === e && t.classList.add("force-bottom"), "hidden" === e && t.classList.add("force-hidden"), console.log("UI Mode applied:", e) } function saveUILayout(e) { if ("undefined" != typeof FS) try { FS.writeFile(UI_CONFIG_PATH, e), js_sync_fs() } catch (e) { console.error("Error saving UI config:", e) } } function loadUILayout() { if ("undefined" != typeof FS) try { FS.analyzePath(UI_CONFIG_PATH).exists && (currentUIMode = FS.readFile(UI_CONFIG_PATH, { encoding: "utf8" }).trim(), applyUILayout(currentUIMode)) } catch (e) { console.log("No UI config found yet.") } }</script>
+        <script async src=index.js></script>
+    </body>
+
+    </html>
